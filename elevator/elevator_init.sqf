@@ -9,10 +9,6 @@ if (count _this != 1) exitWith {
 
 _folder = (_this select 0) + "\";
 
-// global functions
-execVM (_folder + "vector.sqf");
-execVM (_folder + "elevator_functions.sqf");
-
 // global variables
 if (isNil "ELE_PlatformClass") then { ELE_PlatformClass = "MetalFloor_DZ" };
 if (isNil "ELE_StopClass") then { ELE_StopClass = "MetalFloor_Preview_DZ" };
@@ -23,6 +19,10 @@ if (isNil "ELE_StopWaitTime") then { ELE_StopWaitTime = 5 }; // s
 if (isNil "ELE_UpdatesPerSecond") then { ELE_UpdatesPerSecond = 60 }; // animation updates per second
 
 ELE_elevator = nil;
+
+// global functions
+execVM (_folder + "vector.sqf");
+execVM (_folder + "elevator_functions.sqf");
 
 diag_log "Elevator script initialized";
 
