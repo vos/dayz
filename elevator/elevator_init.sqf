@@ -17,6 +17,7 @@ if (isNil "ELE_Size") then { ELE_Size = 4 }; // m
 if (isNil "ELE_Speed") then { ELE_Speed = 2 }; // m/s
 if (isNil "ELE_StopWaitTime") then { ELE_StopWaitTime = 5 }; // s
 if (isNil "ELE_UpdatesPerSecond") then { ELE_UpdatesPerSecond = 60 }; // animation updates per second
+if (isNil "ELE_Debug") then { ELE_Debug = false }; // debug flag
 
 ELE_elevator = nil;
 
@@ -59,7 +60,7 @@ while {true} do {
 			};
 		};
 		// debug actions
-		if (s_player_elevator_id < 0) then {
+		if (ELE_Debug && s_player_elevator_id < 0) then {
 			s_player_elevator_id = player addAction ["<t color=""#ddffffff"">Show Elevator ID</t>", _folder+"elevator_actions.sqf", ["id",_ct], 0, false];
 		};
 	} else {
