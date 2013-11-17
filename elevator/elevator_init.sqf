@@ -35,10 +35,10 @@ while {true} do {
 		if (typeOf _ct == ELE_PlatformClass) then {
 			// elevator actions
 			if ([_ct] call ELE_fnc_isElevator) then {
-				if (s_player_elevator_next < 0) then {
+				if (s_player_elevator_next < 0 && ([_ct] call ELE_fnc_hasNextStop)) then {
 					s_player_elevator_next = player addAction ["<t color=""#ffffff"">Activate Elevator: Next Stop</t>", _folder+"elevator_actions.sqf", ["next",_ct], 5, false];
 				};
-				if (s_player_elevator_previous < 0) then {
+				if (s_player_elevator_previous < 0 && ([_ct] call ELE_fnc_hasPreviousStop)) then {
 					s_player_elevator_previous = player addAction ["<t color=""#ffffff"">Activate Elevator: Previous Stop</t>", _folder+"elevator_actions.sqf", ["previous",_ct], 5, false];
 				};
 				if (s_player_elevator_select < 0) then {
