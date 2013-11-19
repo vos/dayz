@@ -1,40 +1,5 @@
 // elevator functions
 
-// params: object, [id], [classname]
-// return: object
-ELE_fnc_swapObject = {
-	private ["_obj","_objectCharacterID","_objectID","_objectUID","_classname","_location","_dir","_object"];
-	_obj = _this select 0;
-	_objectCharacterID = if (count _this >= 2) then [{_this select 1}, {_obj getVariable ["CharacterID","0"]}];
-	_objectID = _obj getVariable ["ObjectID","0"];
-	_objectUID = _obj getVariable ["ObjectUID","0"];
-	if (_objectID == "0" && _objectUID == "0") exitWith { nil };
-	_classname = if (count _this >= 3) then [{_this select 2}, {typeOf _obj}];
-	_location = _obj getVariable ["OEMPos",(getPosATL _obj)];
-	_dir = getDir _obj;
-	_object = createVehicle [_classname, [0,0,0], [], 0, "CAN_COLLIDE"];
-	_object setDir _dir;
-	_object setPosATL _location;
-	PVDZE_obj_Swap = [_objectCharacterID,_object,[_dir,_location],_classname,_obj,_objectID,_objectUID];
-	publicVariableServer "PVDZE_obj_Swap";
-	player reveal _object;
-	_object
-};
-
-// params: num:number, len:number
-// return: str:string
-ELE_fnc_num2str = {
-	private ["_num","_len","_str","_numArr","_i"];
-	_num = _this select 0;
-	_len = _this select 1;
-	_str = str _num;
-	_numArr = toArray _str;
-	for "_i" from (count _numArr) to (_len-1) do {
-		_str = "0" + _str;
-	};
-	_str
-};
-
 // params: obj:object
 // return: [elevator_id:number, stop_id:number]
 ELE_fnc_getElevatorId = {
@@ -104,7 +69,7 @@ ELE_fnc_generateElevatorId = {
 		};
 	} forEach ((getPos _obj) nearObjects [ELE_PlatformClass, _maxDistance]);
 	if (_id > _maxElevatorId) exitWith { "" };
-	_idStr = [_id, 3] call ELE_fnc_num2str;
+	_idStr = [_id, 3] call AC_fnc_num2str;
 	_eid = "6976" + _idStr + "0";
 	diag_log format ["ELE_fnc_generateElevatorId elevator id generated: %1", _eid];
 	_eid
@@ -172,7 +137,7 @@ ELE_fnc_getNextStopId = {
 		diag_log format ["ELE_fnc_getNextStopId stop %1 already exists", _nextStopId];
 		""
 	};
-	_idStr = [_id, 3] call ELE_fnc_num2str;
+	_idStr = [_id, 3] call AC_fnc_num2str;
 	_eid = "6976" + _idStr + (str _nextStopId);
 	diag_log format ["ELE_fnc_getNextStopId next stop id: %1", _eid];
 	_eid
@@ -208,6 +173,7 @@ ELE_fnc_activateElevator = {
 		deleteVehicle _elevator; // delete original
 		// create new elevator
 		_elevator = createVehicle [ELE_PlatformClass, [0,0,0], [], 0, "CAN_COLLIDE"];
+		// _elevator = ELE_PlatformClass createVehicleLocal _pos;
 		_elevator setDir _dir;
 		_elevator setPosATL _pos;
 		_elevator setVariable ["ElevatorID", _id, true];
@@ -224,6 +190,7 @@ ELE_fnc_activateElevator = {
 	} else {
 		// make the elevator local to the player who activated it
 		if (!local _elevator) then {
+			// use setOwner on the server instead?
 			_dir = getDir _elevator;
 			deleteVehicle _elevator; // delete original
 			// create new elevator
@@ -268,7 +235,7 @@ ELE_fnc_activateElevator = {
 	cutText ["... elevator stop reached", "PLAIN DOWN"];
 };
 
-// params: elevatorStop:object 
+// params: elevatorStop:object
 ELE_fnc_callElevator = {
 	private ["_elevatorStop","_id","_elevatorId","_stopId","_elevator","_xid","_currentStopId","_stopDiff"];
 	_elevatorStop = _this select 0;

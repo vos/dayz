@@ -17,28 +17,32 @@ if (isNil "ELE_Size") then { ELE_Size = 4 }; // m
 if (isNil "ELE_Speed") then { ELE_Speed = 2 }; // m/s
 if (isNil "ELE_StopWaitTime") then { ELE_StopWaitTime = 5 }; // s
 if (isNil "ELE_UpdatesPerSecond") then { ELE_UpdatesPerSecond = 60 }; // animation updates per second
+if (isNil "ELE_RequiredBuildTools") then { ELE_RequiredBuildTools = ["ItemToolbox", "ItemCrowbar"] }; // required tools for building an elevator and elevator stop
+if (isNil "ELE_RequiredBuildItems") then { ELE_RequiredBuildItems = [["PartGeneric",4], "PartEngine", "ItemGenerator", "ItemJerrycan"] }; // required items to build an elevator
+if (isNil "ELE_RequiredBuildStopItems") then { ELE_RequiredBuildStopItems = [["PartGeneric",4]] }; // required items to build an elevator stop
 if (isNil "ELE_Debug") then { ELE_Debug = false }; // debug flag
 
 ELE_elevator = nil;
 
 // global functions
-execVM (_folder + "vector.sqf");
-execVM (_folder + "elevator_functions.sqf");
+call compile preprocessFileLineNumbers (_folder + "vector.sqf");
+call compile preprocessFileLineNumbers (_folder + "ac_functions.sqf");
+call compile preprocessFileLineNumbers (_folder + "elevator_functions.sqf");
 
 diag_log "Elevator script initialized";
 
 // elevator actions
 while {true} do {
 	_ct = cursorTarget;
-	if (!isNull _ct && (player distance _ct < ELE_Size)) then {
+	if ((player distance _ct < ELE_Size) && !isNull _ct) then {
 		// has target
 		if (typeOf _ct == ELE_PlatformClass) then {
 			// elevator actions
 			if ([_ct] call ELE_fnc_isElevator) then {
-				if (s_player_elevator_next < 0 && ([_ct] call ELE_fnc_hasNextStop)) then {
+				if (([_ct] call ELE_fnc_hasNextStop) && s_player_elevator_next < 0) then {
 					s_player_elevator_next = player addAction ["<t color=""#ffffff"">Activate Elevator: Next Stop</t>", _folder+"elevator_actions.sqf", ["next",_ct], 5, false];
 				};
-				if (s_player_elevator_previous < 0 && ([_ct] call ELE_fnc_hasPreviousStop)) then {
+				if (([_ct] call ELE_fnc_hasPreviousStop) && s_player_elevator_previous < 0) then {
 					s_player_elevator_previous = player addAction ["<t color=""#ffffff"">Activate Elevator: Previous Stop</t>", _folder+"elevator_actions.sqf", ["previous",_ct], 5, false];
 				};
 				if (s_player_elevator_select < 0) then {
@@ -60,7 +64,7 @@ while {true} do {
 			};
 		};
 		// debug actions
-		if (ELE_Debug && s_player_elevator_id < 0) then {
+		if (s_player_elevator_id < 0 && ELE_Debug) then {
 			s_player_elevator_id = player addAction ["<t color=""#ddffffff"">Show Elevator ID</t>", _folder+"elevator_actions.sqf", ["id",_ct], 0, false];
 		};
 	} else {
