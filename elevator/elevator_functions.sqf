@@ -216,7 +216,7 @@ ELE_fnc_activateElevator = {
 	// direction pos -> dest
 	_dir = [_dest, _pos] call VEC_fnc_sub;
 	// normalize dir vector to the elevator speed
-	_dir = [_dir] call VEC_fnc_unit;
+	_dir = _dir call VEC_fnc_unit;
 	_dir = [_dir, ELE_Speed * _updateInterval] call VEC_fnc_mul;
 	_distLast = _dist;
 	// if the distance is greater than last iteration we have reached the destination (went past it actually)

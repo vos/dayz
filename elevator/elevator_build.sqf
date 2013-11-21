@@ -15,7 +15,7 @@ switch (_option) do {
 		_obj = _args select 1;
 		_id = [_obj] call ELE_fnc_generateElevatorId;
 		if (_id == "") exitWith { cutText ["invalid elevator ID generated", "PLAIN"] };
-		if (([ELE_RequiredBuildItems] call AC_fnc_checkAndRemoveRequirements) && ([ELE_RequiredBuildTools] call AC_fnc_hasTools)) then {
+		if ((ELE_RequiredBuildItems call AC_fnc_checkAndRemoveRequirements) && (ELE_RequiredBuildTools call AC_fnc_hasTools)) then {
 			["Medic", ELE_MaxRange] call AC_fnc_doAnimationAndAlertZombies;
 			ELE_elevator = [_obj, _id] call AC_fnc_swapObject;
 			titleText ["Elevator Built", "PLAIN"];
@@ -28,7 +28,7 @@ switch (_option) do {
 		if (_dist > ELE_MaxRange) exitWith { cutText [format["Elevator Stop is to far away from Elevator (%1 > %2)", _dist, ELE_MaxRange], "PLAIN"] };
 		_id = [ELE_elevator] call ELE_fnc_getNextStopId;
 		if (_id == "") exitWith { cutText ["Elevator Stop already exists or to many (max. 9 per Elevator)", "PLAIN"] };
-		if (([ELE_RequiredBuildStopItems] call AC_fnc_checkAndRemoveRequirements) && ([ELE_RequiredBuildTools] call AC_fnc_hasTools)) then {
+		if ((ELE_RequiredBuildStopItems call AC_fnc_checkAndRemoveRequirements) && (ELE_RequiredBuildTools call AC_fnc_hasTools)) then {
 			["Medic", ELE_MaxRange] call AC_fnc_doAnimationAndAlertZombies;
 			_elevatorStop = [_obj, _id, ELE_StopClass] call AC_fnc_swapObject;
 			titleText ["Elevator Stop Built", "PLAIN"];
