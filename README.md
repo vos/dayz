@@ -1,7 +1,8 @@
 DayZ (Epoch) Scripts
 ====================
 
-## Vehicle Service Point [Refuel, Repair, Rearm] (Script)
+## Vehicle Service Point (Refuel, Repair, Rearm) \[Script\]
+http://dayzepoch.com/forum/index.php?/topic/3935-release-vehicle-service-point-refuel-repair-rearm-script/
 
 ## Areal Maintenance for Player Bases (Script)
 http://dayzepoch.com/forum/index.php?/topic/3603-release-areal-maintenance-for-player-bases-script/
