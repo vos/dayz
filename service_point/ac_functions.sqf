@@ -1,4 +1,4 @@
-// helper functions by Axe Cop
+// DayZ Epoch Helper Functions by Axe Cop
 
 private ["_version","_skip"];
 _version = 1.0;

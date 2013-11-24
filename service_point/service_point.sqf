@@ -1,6 +1,6 @@
 // Vehicle Service Point by Axe Cop
 
-private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_refuel_action","_repair_action","_rearm_actions","_fnc_removeActions","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
+private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_repair_repairTime","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_refuel_action","_repair_action","_rearm_actions","_fnc_removeActions","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
 
 // ---------------- CONFIG START ----------------
 
@@ -15,12 +15,13 @@ _costsFree = "free"; // text for no costs
 // refuel settings
 _refuel_enable = true; // enable or disable the refuel option
 _refuel_costs = []; // free
-_refuel_updateInterval = 0.5; // update interval in seconds
+_refuel_updateInterval = 0.5; // update interval (in seconds)
 _refuel_amount = 0.02; // amount of fuel to add with every update (in percent)
 
 // repair settings
 _repair_enable = true; // enable or disable the repair option
 _repair_costs = ["ItemGoldBar",2]; // 2 Gold
+_repair_repairTime = 2; // time needed to repair each damaged part (in seconds)
 
 // rearm settings
 _rearm_enable = true; // enable or disable the rearm option
@@ -118,7 +119,7 @@ while {true} do {
 			};
 			if (_repair_action < 0 && _repair_enable) then {
 				_actionTitle = ["Repair", _repair_costs] call _fnc_actionTitle;
-				_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_repair_costs], -1, false, true, "", _actionCondition];
+				_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_repair_costs, _repair_repairTime], -1, false, true, "", _actionCondition];
 			};
 			if ((_role call _fnc_isArmed) && (count _rearm_actions == 0) && _rearm_enable) then {
 				private ["_weapons"];
