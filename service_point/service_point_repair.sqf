@@ -35,7 +35,7 @@ _allRepaired = true;
 			_partName set [1,45];
 			_partName set [2,20];
 			_partName = toString _partName;
-			titleText [format["Repairing%1 ...", _partName], "PLAIN DOWN"];
+			titleText [format["Repairing%1 ...", _partName], "PLAIN DOWN", _repairTime];
 			sleep _repairTime;
 		};
 		_selection = getText(configFile >> "cfgVehicles" >> _type >> "HitPoints" >> _x >> "name");

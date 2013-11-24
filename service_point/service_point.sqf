@@ -1,6 +1,6 @@
 // Vehicle Service Point by Axe Cop
 
-private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_repair_repairTime","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_refuel_action","_repair_action","_rearm_actions","_fnc_removeActions","_fnc_getCosts","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
+private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_message","_messageShown","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_repair_repairTime","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_refuel_action","_repair_action","_rearm_actions","_fnc_removeActions","_fnc_getCosts","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
 
 // ---------------- CONFIG START ----------------
 
@@ -11,6 +11,7 @@ _maxDistance = 10; // maximum distance from a service point for the options to b
 _actionTitleFormat = "%1 (%2)"; // text of the vehicle menu, %1 = action name (Refuel, Repair, Rearm), %2 = costs (see format below)
 _actionCostsFormat = "%2 %1"; // %1 = item name, %2 = item count
 _costsFree = "free"; // text for no costs
+_message = "Vehicle Service Point nearby"; // message to be shown when in range of a service point (set to "" to disable)
 
 // refuel settings
 _refuel_enable = true; // enable or disable the refuel option
@@ -45,6 +46,8 @@ _lastRole = [];
 _refuel_action = -1;
 _repair_action = -1;
 _rearm_actions = [];
+
+_messageShown = false;
 
 _fnc_removeActions = {
 	if (isNull _lastVehicle) exitWith {};
@@ -157,11 +160,17 @@ while {true} do {
 					_rearm_actions set [count _rearm_actions, _rearm_action];
 				} forEach _weapons;
 			};
+			if (!_messageShown && _message != "") then {
+				_messageShown = true;
+				_vehicle vehicleChat _message;
+			};
 		} else {
 			call _fnc_removeActions;
+			_messageShown = false;
 		};
 	} else {
 		call _fnc_removeActions;
+		_messageShown = false;
 	};
 	sleep 2;
 };
