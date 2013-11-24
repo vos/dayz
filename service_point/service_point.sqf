@@ -1,6 +1,6 @@
 // Vehicle Service Point by Axe Cop
 
-private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_repair_repairTime","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_refuel_action","_repair_action","_rearm_actions","_fnc_removeActions","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
+private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_repair_repairTime","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_refuel_action","_repair_action","_rearm_actions","_fnc_removeActions","_fnc_getCosts","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
 
 // ---------------- CONFIG START ----------------
 
@@ -14,18 +14,25 @@ _costsFree = "free"; // text for no costs
 
 // refuel settings
 _refuel_enable = true; // enable or disable the refuel option
-_refuel_costs = []; // free
+_refuel_costs = []; // free for all vehicles (equal to [["AllVehicles",[]]])
 _refuel_updateInterval = 0.5; // update interval (in seconds)
 _refuel_amount = 0.02; // amount of fuel to add with every update (in percent)
 
 // repair settings
 _repair_enable = true; // enable or disable the repair option
-_repair_costs = ["ItemGoldBar",2]; // 2 Gold
+_repair_costs = [
+	["Air",["ItemGoldBar",5]], // 5 Gold for helicopters and planes
+	["AllVehicles",["ItemGoldBar",2]] // 2 Gold for all other vehicles
+];
 _repair_repairTime = 2; // time needed to repair each damaged part (in seconds)
 
 // rearm settings
 _rearm_enable = true; // enable or disable the rearm option
-_rearm_costs = ["ItemGoldBar10oz",3]; // 3 10oz Gold
+_rearm_costs = [
+	["ArmoredSUV_PMC_DZE",["ItemGoldBar10oz",2]], // special costs for a single vehicle type
+	["Air",["ItemGoldBar10oz",2]], // 2 10oz Gold for helicopters and planes
+	["AllVehicles",["ItemGoldBar10oz",1]] // 1 10oz Gold for all other vehicles
+];
 _rearm_magazineCount = 3; // amount of magazines to be added to the vehicle weapon
 
 // ----------------- CONFIG END -----------------
@@ -51,6 +58,21 @@ _fnc_removeActions = {
 	_rearm_actions = [];
 	_lastVehicle = objNull;
 	_lastRole = [];
+};
+
+_fnc_getCosts = {
+	private ["_vehicle","_costs","_cost"];
+	_vehicle = _this select 0;
+	_costs = _this select 1;
+	_cost = [];
+	{
+		private "_typeName";
+		_typeName = _x select 0;
+		if (_vehicle isKindOf _typeName) exitWith {
+			_cost = _x select 1;
+		};
+	} forEach _costs;
+	_cost
 };
 
 _fnc_actionTitle = {
@@ -104,7 +126,7 @@ while {true} do {
 		_objects = nearestObjects [_pos, _servicePointClasses, _maxDistance];
 		_inRange = count _objects > 0;
 		if (_inRange) then {
-			private ["_role","_actionCondition","_actionTitle"];
+			private ["_role","_actionCondition","_costs","_actionTitle"];
 			_role = assignedVehicleRole player;
 			if (((str _role) != (str _lastRole)) || (_vehicle != _lastVehicle)) then {
 				// vehicle or seat changed
@@ -114,21 +136,24 @@ while {true} do {
 			_lastRole = _role;
 			_actionCondition = "vehicle _this == _target && local _target";
 			if (_refuel_action < 0 && _refuel_enable) then {
-				_actionTitle = ["Refuel", _refuel_costs] call _fnc_actionTitle;
-				_refuel_action = _vehicle addAction [_actionTitle, _folder + "service_point_refuel.sqf", [_refuel_costs, _refuel_updateInterval, _refuel_amount], -1, false, true, "", _actionCondition];
+				_costs = [_vehicle, _refuel_costs] call _fnc_getCosts;
+				_actionTitle = ["Refuel", _costs] call _fnc_actionTitle;
+				_refuel_action = _vehicle addAction [_actionTitle, _folder + "service_point_refuel.sqf", [_costs, _refuel_updateInterval, _refuel_amount], -1, false, true, "", _actionCondition];
 			};
 			if (_repair_action < 0 && _repair_enable) then {
-				_actionTitle = ["Repair", _repair_costs] call _fnc_actionTitle;
-				_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_repair_costs, _repair_repairTime], -1, false, true, "", _actionCondition];
+				_costs = [_vehicle, _repair_costs] call _fnc_getCosts;
+				_actionTitle = ["Repair", _costs] call _fnc_actionTitle;
+				_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_costs, _repair_repairTime], -1, false, true, "", _actionCondition];
 			};
 			if ((_role call _fnc_isArmed) && (count _rearm_actions == 0) && _rearm_enable) then {
 				private ["_weapons"];
+				_costs = [_vehicle, _rearm_costs] call _fnc_getCosts;
 				_weapons = [_vehicle, _role] call _fnc_getWeapons;
 				{
 					private ["_weaponName","_rearm_action"];
 					_weaponName = _x select 1;
-					_actionTitle = [format["Rearm %1", _weaponName], _rearm_costs] call _fnc_actionTitle;
-					_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_rearm_costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
+					_actionTitle = [format["Rearm %1", _weaponName], _costs] call _fnc_actionTitle;
+					_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
 					_rearm_actions set [count _rearm_actions, _rearm_action];
 				} forEach _weapons;
 			};
