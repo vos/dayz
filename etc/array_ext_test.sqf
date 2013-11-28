@@ -89,6 +89,16 @@ _data = [1,2,3,4,5,6,7,8,9];
 ["AEX_distinct #3", _data, (_data + _data) call AEX_distinct] call _fnc_assertEqual;
 ["AEX_distinct #3", [1,2,3,5,4,6], [1,2,2,1,3,5,4,6,4] call AEX_distinct] call _fnc_assertEqual;
 
+["AEX_sort #1", [], [[]] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #2", [5], [[5]] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #3", [1,2,3,4,5,6,7,8,9], [[1,2,3,4,5,6,7,8,9]] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #4", [1,2,3], [[3,2,1]] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #5", [1,2,3,4,5,6,7,8,9], [[5,7,9,2,6,1,3,8,4]] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #6", [9,8,7,6,5,4,3,2,1], [[9,8,7,6,5,4,3,2,1], AEX_order_desc] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #7", [9,8,7,6,5,4,3,2,1], [[1,2,3,4,5,6,7,8,9], AEX_order_desc] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #8", [9,8,7,6,5,4,3,2,1], [[5,7,9,2,6,1,3,8,4], AEX_order_desc] call AEX_sort] call _fnc_assertEqual;
+["AEX_sort #9", ["1","2","3","4","5"], [["3","5","1","4","2"], AEX_order_asc, { parseNumber _x }] call AEX_sort] call _fnc_assertEqual;
+
 // real examples
 private ["_vehicles","_vehicleData","_nearEntities","_players","_playerData","_damage"];
 

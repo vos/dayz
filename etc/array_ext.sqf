@@ -175,7 +175,7 @@ AEX_map = {
 
 // Reduces an array to a single value (a scalar usually).
 // param 0: array to apply the function to, should at least contain 2 elements for this function to work
-// param 1: function to reduce the array elements, is passed 2 parameters, "_r" as the current reduced value and "_x" is the current element of the array, the return value should be the new reduced value
+// param 1: function to reduce the array elements, is passed 2 arguments, "_r" as the current reduced value and "_x" is the current element of the array, the return value should be the new reduced value
 // param 2 (optional): start value, if omitted the first two array elements will be used as arguments for the first function call
 // returns: the final value of the last function call or "nil" if the array contains less than 2 elements
 AEX_reduce = {
@@ -275,7 +275,60 @@ AEX_distinct = {
 	_ao
 };
 
-// Sorts an array according to an ordering function.
-AEX_sort = {
-	// TODO best algo?
+// private call doesn't work
+AEX_quicksort = {
+	private ["_ar","_of","_mf","_lo","_hi","_i","_j","_x","_b","_a","_h"];
+	_ar = _this select 0;
+	_of = _this select 1;
+	_mf = _this select 2;
+	_lo = _this select 3;
+	_hi = _this select 4;
+	_i = _lo;
+	_j = _hi;
+	_x = _ar select ((_lo + _hi) / 2);
+	_b = _x call _mf;
+	while {_i <= _j} do {
+		while {true} do {
+			_x = _ar select _i;
+			_a = _x call _mf;
+			if (([_a, _b] call _of) >= 0) exitWith {};
+			_i = _i + 1;
+		};
+		while {true} do {
+			_x = _ar select _j;
+			_a = _x call _mf;
+			if (([_a, _b] call _of) <= 0) exitWith {};
+			_j = _j - 1;
+		};
+		if (_i <= _j) then {
+			_h = _ar select _i;
+			_ar set [_i, _ar select _j];
+			_ar set [_j, _h];
+			_i = _i + 1;
+			_j = _j - 1;
+		};
+	};
+	if (_lo < _j) then { [_ar, _of, _mf, _lo, _j] call AEX_quicksort; };
+	if (_i < _hi) then { [_ar, _of, _mf, _i, _hi] call AEX_quicksort; };
 };
+
+// Sorts an array according to an ordering function.
+// param 0: array
+// param 1 (optional): ordering function, is passed two arguments "_a" and "_b" (returns a negative number, zero, or a positive number as "_a" is less than, equal to, or greater than "_b"), default function is AEX_order_asc
+// param 2 (optional): mapping function, is passed "_x" as an element of the array and should return a numeric value (default: returns the element itself)
+// returns: sorted array
+AEX_sort = {
+	private ["_a","_of","_mf"];
+	_a = _this select 0;
+	if (count _a < 2) exitWith { _a };
+	_of = if (count _this > 1) then { _this select 1 } else { AEX_order_asc };
+	_mf = if (count _this > 2) then { _this select 2 } else { { _x } };
+	[_a, _of, _mf, 0, (count _a) - 1] call AEX_quicksort;
+	_a
+};
+
+// Ordering function for ascending order.
+AEX_order_asc = { _a - _b };
+
+// Ordering function for descending order.
+AEX_order_desc = { _b - _a };
