@@ -6,11 +6,6 @@ private ["_data"];
 
 _data = [1,2,3,4,5,6,7,8,9];
 
-["AEX_contains #1", [_data, 123] call AEX_contains] call _fnc_assertFalse;
-["AEX_contains #2", [_data, 5] call AEX_contains] call _fnc_assertTrue;
-["AEX_contains #3", [_data, 1] call AEX_contains] call _fnc_assertTrue;
-["AEX_contains #4", [_data, 9] call AEX_contains] call _fnc_assertTrue;
-
 ["AEX_count #1", count _data, [_data, { true }] call AEX_count] call _fnc_assertEqual;
 ["AEX_count #2", 0, [_data, { false }] call AEX_count] call _fnc_assertEqual;
 ["AEX_count #3", 3, [_data, { _x <= 3 }] call AEX_count] call _fnc_assertEqual;
@@ -79,15 +74,30 @@ _data = [1,2,3,4,5,6,7,8,9];
 ["AEX_reverse #2", [9,8,7,6,5,4,3,2,1], _data call AEX_reverse] call _fnc_assertEqual;
 ["AEX_reverse #3", [1,2,3], [3,2,1] call AEX_reverse] call _fnc_assertEqual;
 
+["AEX_contains #1", [_data, 123] call AEX_contains] call _fnc_assertFalse;
+["AEX_contains #2", [_data, 5] call AEX_contains] call _fnc_assertTrue;
+["AEX_contains #3", [_data, 1] call AEX_contains] call _fnc_assertTrue;
+["AEX_contains #4", [_data, 9] call AEX_contains] call _fnc_assertTrue;
+["AEX_contains #5", [[1,2,3], "2", { _a == parseNumber _b }] call AEX_contains] call _fnc_assertTrue;
+["AEX_contains #6", [[1,2,3], "5", { _a == parseNumber _b }] call AEX_contains] call _fnc_assertFalse;
+
 ["AEX_equals #1", [[], []] call AEX_equals] call _fnc_assertTrue;
 ["AEX_equals #2", [_data, _data] call AEX_equals] call _fnc_assertTrue;
 ["AEX_equals #3", [[1,2,3], [1,2,3]] call AEX_equals] call _fnc_assertTrue;
 ["AEX_equals #4", [[1,2,3], [3,2,1]] call AEX_equals] call _fnc_assertFalse;
+["AEX_equals #5", [[1,2,3], ["1","2","3"], { _a == parseNumber _b }] call AEX_equals] call _fnc_assertTrue;
+["AEX_equals #6", [[], [], AEX_equal_deep] call AEX_equals] call _fnc_assertTrue;
+["AEX_equals #7", [_data, _data, AEX_equal_deep] call AEX_equals] call _fnc_assertTrue;
+["AEX_equals #8", [[[1,2,3]], [[1,2,3]], AEX_equal_deep] call AEX_equals] call _fnc_assertTrue;
+["AEX_equals #9", [[[1,2],[3,4,5],[6],[]], [[1,2],[3,4,5],[6],[]], AEX_equal_deep] call AEX_equals] call _fnc_assertTrue;
+["AEX_equals #10", [[[1,2],[5,4,3]], [[1,2],[3,4,5]], AEX_equal_deep] call AEX_equals] call _fnc_assertFalse;
+["AEX_equals #11", [[[1,2],[5,4,3]], [[1,2],[3,4]], AEX_equal_deep] call AEX_equals] call _fnc_assertFalse;
 
-["AEX_distinct #1", [], [] call AEX_distinct] call _fnc_assertEqual;
-["AEX_distinct #2", _data, _data call AEX_distinct] call _fnc_assertEqual;
-["AEX_distinct #3", _data, (_data + _data) call AEX_distinct] call _fnc_assertEqual;
-["AEX_distinct #3", [1,2,3,5,4,6], [1,2,2,1,3,5,4,6,4] call AEX_distinct] call _fnc_assertEqual;
+["AEX_distinct #1", [], [[]] call AEX_distinct] call _fnc_assertEqual;
+["AEX_distinct #2", _data, [_data] call AEX_distinct] call _fnc_assertEqual;
+["AEX_distinct #3", _data, [_data + _data] call AEX_distinct] call _fnc_assertEqual;
+["AEX_distinct #4", [1,2,3,5,4,6], [[1,2,2,1,3,5,4,6,4]] call AEX_distinct] call _fnc_assertEqual;
+["AEX_distinct #5", ["a","b","c"], [["a","b","c","b","a"]] call AEX_distinct] call _fnc_assertEqual;
 
 ["AEX_sort #1", [], [[]] call AEX_sort] call _fnc_assertEqual;
 ["AEX_sort #2", [5], [[5]] call AEX_sort] call _fnc_assertEqual;

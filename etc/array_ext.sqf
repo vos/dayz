@@ -14,23 +14,6 @@ AEX_isEmpty = {
 	count _this == 0
 };
 
-// Tests whether an array contains a given value as an element.
-// param 0: array
-// param 1: element to test
-// returns: true if array contains the element; false otherwise
-AEX_contains = {
-	private ["_a","_e","_r"];
-	_a = _this select 0;
-	_e = _this select 1;
-	_r = false;
-	{
-		if (_x == _e) exitWith {
-			_r = true;
-		};
-	} forEach _a;
-	_r
-};
-
 // Counts all elements of an array which satisfy a predicate.
 // param 0: array to count
 // param 1: function to count the elements, is passed the current element of the array as "_x" and should return a boolean (true to count the element)
@@ -241,41 +224,78 @@ AEX_reverse = {
 	_ao
 };
 
+// Default equality function.
+AEX_equal = { _a == _b };
+
+// Equality function for nested arrays.
+AEX_equal_deep = {
+	if ((_a call AEX_isArray) && (_b call AEX_isArray)) then {
+		[_a, _b] call AEX_equals
+	} else {
+		[_a, _b] call AEX_equal
+	};
+};
+
+// Tests whether an array contains a given value as an element.
+// param 0: array
+// param 1: element to test
+// param 2 (optional): equality function, is passed two arguments "_a" (element of the array) and "_b" (element to test) and should return true if the elements match, default function is AEX_equal
+// returns: true if array contains the element; false otherwise
+AEX_contains = {
+	private ["_ar","_b","_ef","_m","_a"];
+	_ar = _this select 0;
+	_b = _this select 1;
+	_ef = if (count _this > 2) then { _this select 2 } else { AEX_equal };
+	_m = false;
+	{
+		_a = _x;
+		if ([_a, _b] call _ef) exitWith {
+			_m = true;
+		};
+	} forEach _ar;
+	_m
+};
+
 // Compares two arrays.
 // param 0: first array
 // param 1: second array
+// param 2 (optional): equality function, is passed two arguments "_a" and "_b" (one element of each array) and should return true if the elements match, default function is AEX_equal
 // returns: true if both arrays are of the same size and all elements match; false otherwise
-// TODO use equality function?
 AEX_equals = {
-	private ["_a","_b","_c","_e"];
-	_a = _this select 0;
-	_b = _this select 1;
-	_c = count _a;
-	if (_c != count _b) exitWith { false };
+	private ["_aa","_ab","_c","_ef","_e","_a","_b"];
+	_aa = _this select 0;
+	_ab = _this select 1;
+	_c = count _aa;
+	if (_c != count _ab) exitWith { false };
+	_ef = if (count _this > 2) then { _this select 2 } else { AEX_equal };
 	_e = true;
 	for "_i" from 0 to (_c - 1) do {
-		if ((_a select _i) != (_b select _i)) exitWith { _e = false; };
+		_a = _aa select _i;
+		_b = _ab select _i;
+		if !([_a, _b] call _ef) exitWith { _e = false; };
 	};
 	_e
 };
 
 // Builds a new array without any duplicate elements.
-// param: array
+// param 0: array
+// param 1 (optional): equality function, is passed two arguments "_a" and "_b" (two elements from the array) and should return true if the elements match, default function is AEX_equal
 // returns: array with only distinct elements
 // TODO optimize?
 AEX_distinct = {
-	private ["_a","_ao"];
-	_a = _this;
+	private ["_a","_ef","_ao"];
+	_a = _this select 0;
+	_ef = if (count _this > 1) then { _this select 1 } else { AEX_equal };
 	_ao = [];
 	{
-		if !([_ao, _x] call AEX_contains) then {
+		if !([_ao, _x, _ef] call AEX_contains) then {
 			_ao set [count _ao, _x];
 		}
 	} forEach _a;
 	_ao
 };
 
-// private call doesn't work
+// should be private, but private call doesn't work
 AEX_quicksort = {
 	private ["_ar","_of","_mf","_lo","_hi","_i","_j","_x","_b","_a","_h"];
 	_ar = _this select 0;
@@ -312,6 +332,12 @@ AEX_quicksort = {
 	if (_i < _hi) then { [_ar, _of, _mf, _i, _hi] call AEX_quicksort; };
 };
 
+// Ordering function for ascending order.
+AEX_order_asc = { _a - _b };
+
+// Ordering function for descending order.
+AEX_order_desc = { _b - _a };
+
 // Sorts an array according to an ordering function.
 // param 0: array
 // param 1 (optional): ordering function, is passed two arguments "_a" and "_b" (returns a negative number, zero, or a positive number as "_a" is less than, equal to, or greater than "_b"), default function is AEX_order_asc
@@ -326,9 +352,3 @@ AEX_sort = {
 	[_a, _of, _mf, 0, (count _a) - 1] call AEX_quicksort;
 	_a
 };
-
-// Ordering function for ascending order.
-AEX_order_asc = { _a - _b };
-
-// Ordering function for descending order.
-AEX_order_desc = { _b - _a };
