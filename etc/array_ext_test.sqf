@@ -110,7 +110,7 @@ _data = [1,2,3,4,5,6,7,8,9];
 ["AEX_sort #9", ["1","2","3","4","5"], [["3","5","1","4","2"], AEX_order_asc, { parseNumber _x }] call AEX_sort] call _fnc_assertEqual;
 
 // real examples
-private ["_vehicles","_vehicleData","_nearEntities","_players","_playerData","_damage"];
+private ["_vehicles","_vehicleData","_nearEntities","_players","_playerData","_damage","_units"];
 
 // vehicles with at least 10% damage are mapped to an data array like [vehicle type, position, damage]
 _vehicles = [vehicles, { damage _x > .1 }] call AEX_filter;
@@ -127,5 +127,12 @@ diag_log ["AEX near players with toolbox", _players, _playerData];
 
 // overall damage of all units
 _damage = [allUnits, { _r + damage _x }, 0] call AEX_reduce;
-diag_log ["AEX overall damage of all units", _damage];
-// ["AEX overall damage of all units",2.457]
+if (!isNil "_damage") then {
+	// can be nil if array has less than 2 elements
+	diag_log ["AEX overall damage of all units", _damage];
+	// ["AEX overall damage of all units",2.457]
+};
+
+// sort all units ascending to their damage
+_units = [+allUnits, AEX_order_asc, { damage _x }] call AEX_sort;
+diag_log ["AEX sorted units", _units];

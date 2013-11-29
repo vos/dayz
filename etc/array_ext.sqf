@@ -230,7 +230,7 @@ AEX_equal = { _a == _b };
 // Equality function for nested arrays.
 AEX_equal_deep = {
 	if ((_a call AEX_isArray) && (_b call AEX_isArray)) then {
-		[_a, _b] call AEX_equals
+		[_a, _b, AEX_equal_deep] call AEX_equals
 	} else {
 		[_a, _b] call AEX_equal
 	};
