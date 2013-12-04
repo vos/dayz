@@ -1,14 +1,15 @@
 // Vehicle Service Point (Rearm) by Axe Cop
 
-private ["_vehicle","_args","_costs","_magazineCount","_weapon","_type","_name","_weaponType","_weaponName","_turret","_magazines","_ammo"];
+private ["_vehicle","_args","_servicePoint","_costs","_magazineCount","_weapon","_type","_name","_weaponType","_weaponName","_turret","_magazines","_ammo"];
 
 _vehicle = _this select 0;
 if (!local _vehicle) exitWith { diag_log format["Error: called service_point_rearm.sqf with non-local vehicle: %1", _vehicle] };
 
 _args = _this select 3;
-_costs = _args select 0;
-_magazineCount = _args select 1;
-_weapon = _args select 2;
+_servicePoint = _args select 0;
+_costs = _args select 1;
+_magazineCount = _args select 2;
+_weapon = _args select 3;
 
 if !([_costs] call AC_fnc_checkAndRemoveRequirements) exitWith {};
 

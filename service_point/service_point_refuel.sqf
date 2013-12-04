@@ -1,14 +1,15 @@
 // Vehicle Service Point (Refuel) by Axe Cop
 
-private ["_vehicle","_args","_costs","_updateInterval","_amount","_type","_name"];
+private ["_vehicle","_args","_servicePoint","_costs","_updateInterval","_amount","_type","_name"];
 
 _vehicle = _this select 0;
 if (!local _vehicle) exitWith { diag_log format["Error: called service_point_refuel.sqf with non-local vehicle: %1", _vehicle] };
 
 _args = _this select 3;
-_costs = _args select 0;
-_updateInterval = _args select 1;
-_amount = _args select 2;
+_servicePoint = _args select 0;
+_costs = _args select 1;
+_updateInterval = _args select 2;
+_amount = _args select 3;
 
 if !([_costs] call AC_fnc_checkAndRemoveRequirements) exitWith {};
 

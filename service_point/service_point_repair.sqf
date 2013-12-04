@@ -1,13 +1,14 @@
 // Vehicle Service Point (Repair) by Axe Cop
 
-private ["_vehicle","_args","_costs","_repairTime","_type","_name","_hitpoints","_allRepaired"];
+private ["_vehicle","_args","_servicePoint","_costs","_repairTime","_type","_name","_hitpoints","_allRepaired"];
 
 _vehicle = _this select 0;
 if (!local _vehicle) exitWith { diag_log format["Error: called service_point_repair.sqf with non-local vehicle: %1", _vehicle] };
 
 _args = _this select 3;
-_costs = _args select 0;
-_repairTime = _args select 1;
+_servicePoint = _args select 0;
+_costs = _args select 1;
+_repairTime = _args select 2;
 
 if !([_costs] call AC_fnc_checkAndRemoveRequirements) exitWith {};
 

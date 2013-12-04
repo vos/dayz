@@ -16,8 +16,8 @@ _message = "Vehicle Service Point nearby"; // message to be shown when in range 
 // refuel settings
 _refuel_enable = true; // enable or disable the refuel option
 _refuel_costs = []; // free for all vehicles (equal to [["AllVehicles",[]]])
-_refuel_updateInterval = 0.5; // update interval (in seconds)
-_refuel_amount = 0.02; // amount of fuel to add with every update (in percent)
+_refuel_updateInterval = 1; // update interval (in seconds)
+_refuel_amount = 0.05; // amount of fuel to add with every update (in percent)
 
 // repair settings
 _repair_enable = true; // enable or disable the repair option
@@ -124,12 +124,13 @@ while {true} do {
 	_vehicle = vehicle player;
 	_inVehicle = _vehicle != player;
 	if (local _vehicle && _inVehicle) then {
-		private ["_pos","_objects","_inRange"];
-		_pos = position _vehicle;
-		_objects = nearestObjects [_pos, _servicePointClasses, _maxDistance];
-		_inRange = count _objects > 0;
+		private ["_pos","_servicePoints","_inRange"];
+		_pos = getPosATL _vehicle;
+		_servicePoints = (nearestObjects [_pos, _servicePointClasses, _maxDistance]) - [_vehicle];
+		_inRange = count _servicePoints > 0;
 		if (_inRange) then {
-			private ["_role","_actionCondition","_costs","_actionTitle"];
+			private ["_servicePoint","_role","_actionCondition","_costs","_actionTitle"];
+			_servicePoint = _servicePoints select 0;
 			_role = assignedVehicleRole player;
 			if (((str _role) != (str _lastRole)) || (_vehicle != _lastVehicle)) then {
 				// vehicle or seat changed
@@ -141,12 +142,12 @@ while {true} do {
 			if (_refuel_action < 0 && _refuel_enable) then {
 				_costs = [_vehicle, _refuel_costs] call _fnc_getCosts;
 				_actionTitle = ["Refuel", _costs] call _fnc_actionTitle;
-				_refuel_action = _vehicle addAction [_actionTitle, _folder + "service_point_refuel.sqf", [_costs, _refuel_updateInterval, _refuel_amount], -1, false, true, "", _actionCondition];
+				_refuel_action = _vehicle addAction [_actionTitle, _folder + "service_point_refuel.sqf", [_servicePoint, _costs, _refuel_updateInterval, _refuel_amount], -1, false, true, "", _actionCondition];
 			};
 			if (_repair_action < 0 && _repair_enable) then {
 				_costs = [_vehicle, _repair_costs] call _fnc_getCosts;
 				_actionTitle = ["Repair", _costs] call _fnc_actionTitle;
-				_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_costs, _repair_repairTime], -1, false, true, "", _actionCondition];
+				_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_servicePoint, _costs, _repair_repairTime], -1, false, true, "", _actionCondition];
 			};
 			if ((_role call _fnc_isArmed) && (count _rearm_actions == 0) && _rearm_enable) then {
 				private ["_weapons"];
@@ -156,7 +157,7 @@ while {true} do {
 					private ["_weaponName","_rearm_action"];
 					_weaponName = _x select 1;
 					_actionTitle = [format["Rearm %1", _weaponName], _costs] call _fnc_actionTitle;
-					_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
+					_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_servicePoint, _costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
 					_rearm_actions set [count _rearm_actions, _rearm_action];
 				} forEach _weapons;
 			};
