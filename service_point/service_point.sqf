@@ -1,12 +1,12 @@
 // Vehicle Service Point by Axe Cop
 
-private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_message","_messageShown","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_repair_repairTime","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_refuel_action","_repair_action","_rearm_actions","_fnc_removeActions","_fnc_getCosts","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
+private ["_folder","_servicePointClasses","_maxDistance","_actionTitleFormat","_actionCostsFormat","_costsFree","_message","_messageShown","_refuel_enable","_refuel_costs","_refuel_updateInterval","_refuel_amount","_repair_enable","_repair_costs","_repair_repairTime","_rearm_enable","_rearm_costs","_rearm_magazineCount","_lastVehicle","_lastRole","_fnc_removeActions","_fnc_getCosts","_fnc_actionTitle","_fnc_isArmed","_fnc_getWeapons"];
 
 // ---------------- CONFIG START ----------------
 
 // general settings
 _folder = "service_point\"; // folder where the service point scripts are saved, relative to the mission file
-_servicePointClasses = ["Land_A_FuelStation_Feed"]; // service point classes (add "FuelPump_DZ" to use the dynamic Epoch fuel pumps)
+_servicePointClasses = dayz_fuelpumparray; // service point classes (can be house, vehicle and unit classes)
 _maxDistance = 10; // maximum distance from a service point for the options to be shown
 _actionTitleFormat = "%1 (%2)"; // text of the vehicle menu, %1 = action name (Refuel, Repair, Rearm), %2 = costs (see format below)
 _actionCostsFormat = "%2 %1"; // %1 = item name, %2 = item count
@@ -43,22 +43,22 @@ call compile preprocessFileLineNumbers (_folder + "ac_functions.sqf");
 _lastVehicle = objNull;
 _lastRole = [];
 
-_refuel_action = -1;
-_repair_action = -1;
-_rearm_actions = [];
+SP_refuel_action = -1;
+SP_repair_action = -1;
+SP_rearm_actions = [];
 
 _messageShown = false;
 
 _fnc_removeActions = {
 	if (isNull _lastVehicle) exitWith {};
-	_lastVehicle removeAction _refuel_action;
-	_refuel_action = -1;
-	_lastVehicle removeAction _repair_action;
-	_repair_action = -1;
+	_lastVehicle removeAction SP_refuel_action;
+	SP_refuel_action = -1;
+	_lastVehicle removeAction SP_repair_action;
+	SP_repair_action = -1;
 	{
 		_lastVehicle removeAction _x;
-	} forEach _rearm_actions;
-	_rearm_actions = [];
+	} forEach SP_rearm_actions;
+	SP_rearm_actions = [];
 	_lastVehicle = objNull;
 	_lastRole = [];
 };
@@ -139,26 +139,26 @@ while {true} do {
 			_lastVehicle = _vehicle;
 			_lastRole = _role;
 			_actionCondition = "vehicle _this == _target && local _target";
-			if (_refuel_action < 0 && _refuel_enable) then {
+			if (SP_refuel_action < 0 && _refuel_enable) then {
 				_costs = [_vehicle, _refuel_costs] call _fnc_getCosts;
 				_actionTitle = ["Refuel", _costs] call _fnc_actionTitle;
-				_refuel_action = _vehicle addAction [_actionTitle, _folder + "service_point_refuel.sqf", [_servicePoint, _costs, _refuel_updateInterval, _refuel_amount], -1, false, true, "", _actionCondition];
+				SP_refuel_action = _vehicle addAction [_actionTitle, _folder + "service_point_refuel.sqf", [_servicePoint, _costs, _refuel_updateInterval, _refuel_amount], -1, false, true, "", _actionCondition];
 			};
-			if (_repair_action < 0 && _repair_enable) then {
+			if (SP_repair_action < 0 && _repair_enable) then {
 				_costs = [_vehicle, _repair_costs] call _fnc_getCosts;
 				_actionTitle = ["Repair", _costs] call _fnc_actionTitle;
-				_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_servicePoint, _costs, _repair_repairTime], -1, false, true, "", _actionCondition];
+				SP_repair_action = _vehicle addAction [_actionTitle, _folder + "service_point_repair.sqf", [_servicePoint, _costs, _repair_repairTime], -1, false, true, "", _actionCondition];
 			};
-			if ((_role call _fnc_isArmed) && (count _rearm_actions == 0) && _rearm_enable) then {
+			if ((_role call _fnc_isArmed) && (count SP_rearm_actions == 0) && _rearm_enable) then {
 				private ["_weapons"];
 				_costs = [_vehicle, _rearm_costs] call _fnc_getCosts;
 				_weapons = [_vehicle, _role] call _fnc_getWeapons;
 				{
-					private ["_weaponName","_rearm_action"];
+					private "_weaponName";
 					_weaponName = _x select 1;
 					_actionTitle = [format["Rearm %1", _weaponName], _costs] call _fnc_actionTitle;
-					_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_servicePoint, _costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
-					_rearm_actions set [count _rearm_actions, _rearm_action];
+					SP_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_servicePoint, _costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
+					SP_rearm_actions set [count SP_rearm_actions, SP_rearm_action];
 				} forEach _weapons;
 			};
 			if (!_messageShown && _message != "") then {

@@ -165,6 +165,7 @@ ELE_fnc_activateElevator = {
 		cutText ["next elevator stop not found", "PLAIN DOWN"];
 	};
 	_dest = getPosATL _nextStop;
+	_dest set [2, (_dest select 2) + 0.05]; // elevate a little to separate elevator and stop point
 	_pos = getPosATL _elevator;
 	// check here again, if there is no elevator stop no elevator will be created
 	if (_firstActivation) then {

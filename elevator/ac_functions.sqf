@@ -1,7 +1,7 @@
-// helper functions by Axe Cop
+// DayZ Epoch Helper Functions by Axe Cop
 
 private ["_version","_skip"];
-_version = 1.0;
+_version = 1.01;
 
 // redefine functions only if this file is a newer version
 _skip = false;
@@ -51,7 +51,7 @@ AC_fnc_swapObject = {
 	_object = createVehicle [_classname, [0,0,0], [], 0, "CAN_COLLIDE"];
 	_object setDir _dir;
 	_object setPosATL _location;
-	PVDZE_obj_Swap = [_objectCharacterID,_object,[_dir,_location],_classname,_obj,_objectID,_objectUID];
+	PVDZE_obj_Swap = [_objectCharacterID,_object,[_dir,_location],_classname,_obj,_objectID,_objectUID,(getPlayerUID player)];
 	publicVariableServer "PVDZE_obj_Swap";
 	player reveal _object;
 	_object
