@@ -3,7 +3,7 @@ if (!isDedicated) then {
 	DT_openKey = 0x4A; // - on numeric keypad
 	
 	DT_fnc_log = {
-		DT_logMessage = _this;
+		DT_logMessage = format ["%1", _this];
 		publicVariableServer "DT_logMessage";
 	};
 	
@@ -48,7 +48,7 @@ if (!isDedicated) then {
 // server
 if (isServer) then {
 	DT_fnc_log = {
-		"jni" callExtension ["log", _this];
+		"jni" callExtension format ["LOG:%1", _this];
 	};
 	
 	DT_fnc_exec = {
