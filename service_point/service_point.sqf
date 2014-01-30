@@ -38,8 +38,6 @@ _rearm_magazineCount = 3; // amount of magazines to be added to the vehicle weap
 
 // ----------------- CONFIG END -----------------
 
-call compile preprocessFileLineNumbers (_folder + "ac_functions.sqf");
-
 _lastVehicle = objNull;
 _lastRole = [];
 

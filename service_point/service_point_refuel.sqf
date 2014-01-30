@@ -11,7 +11,7 @@ _costs = _args select 1;
 _updateInterval = _args select 2;
 _amount = _args select 3;
 
-if !([_costs] call AC_fnc_checkAndRemoveRequirements) exitWith {};
+if !([_costs] call player_checkAndRemoveItems) exitWith {};
 
 _type = typeOf _vehicle;
 _name = getText(configFile >> "cfgVehicles" >> _type >> "displayName");

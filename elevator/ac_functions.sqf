@@ -1,7 +1,7 @@
 // DayZ Epoch Helper Functions by Axe Cop
 
 private ["_version","_skip"];
-_version = 1.02;
+_version = 1.03;
 
 // redefine functions only if this file is a newer version
 _skip = false;
@@ -77,21 +77,22 @@ AC_fnc_hasTools = {
 // params: requirements:array
 // return: bool
 AC_fnc_checkRequirements = {
-	private ["_requirements","_inventory","_hasRequirements","_itemIn","_countIn","_qty","_missing","_missingQty","_textMissing"];
-	_requirements = _this;
+	private ["_items","_inventory","_hasItems","_itemIn","_countIn","_qty","_missing","_missingQty","_textMissing"];
+	_items = _this;
 	_inventory = magazines player;
-	_hasRequirements = true;
+	_hasItems = true;
 	{
 		_itemIn = "";
 		_countIn = 1;
-		if (_x call AC_fnc_isArray) then {
-			if (count _x >= 2) then {
+		if (typeName _x == "ARRAY") then {
+			if (count _x > 0) then {
 				_itemIn = _x select 0;
-				_countIn = _x select 1;
+				if (count _x > 1) then {
+					_countIn = _x select 1;
+				};
 			};
 		} else {
 			_itemIn = _x;
-			// _countIn = 1;
 		};
 		if (_itemIn != "") then {
 			_qty = { (_x == _itemIn) || (configName(inheritsFrom(configFile >> "cfgMagazines" >> _x)) == _itemIn) } count _inventory;
@@ -101,19 +102,19 @@ AC_fnc_checkRequirements = {
 		if (_qty < _countIn) exitWith {
 			_missing = _itemIn;
 			_missingQty = (_countIn - _qty);
-			_hasRequirements = false;
+			_hasItems = false;
 			_textMissing = getText(configFile >> "CfgMagazines" >> _missing >> "displayName");
 			cutText [format["Missing %1 more of %2", _missingQty, _textMissing], "PLAIN DOWN"];
 		};
-	} forEach _requirements;
-	_hasRequirements
+	} forEach _items;
+	_hasItems
 };
 
 // params: requirements:array
 // return: bool
 AC_fnc_removeRequirements = {
-	private ["_requirements","_inventory","_temp_removed_array","_removed_total","_tobe_removed_total","_removed","_itemIn","_countIn","_num_removed"];
-	_requirements = _this;
+	private ["_items","_inventory","_temp_removed_array","_removed_total","_tobe_removed_total","_removed","_itemIn","_countIn","_num_removed"];
+	_items = _this;
 	_inventory = magazines player;
 	_temp_removed_array = [];
 	_removed_total = 0;
@@ -122,14 +123,15 @@ AC_fnc_removeRequirements = {
 		_removed = 0;
 		_itemIn = "";
 		_countIn = 1;
-		if (_x call AC_fnc_isArray) then {
-			if (count _x >= 2) then {
+		if (typeName _x == "ARRAY") then {
+			if (count _x > 0) then {
 				_itemIn = _x select 0;
-				_countIn = _x select 1;
+				if (count _x > 1) then {
+					_countIn = _x select 1;
+				};
 			};
 		} else {
 			_itemIn = _x;
-			// _countIn = 1;
 		};
 		if (_itemIn != "") then {
 			_tobe_removed_total = _tobe_removed_total + _countIn;
@@ -144,7 +146,7 @@ AC_fnc_removeRequirements = {
 				};
 			} forEach _inventory;
 		};
-	} forEach _requirements;
+	} forEach _items;
 	// all parts removed
 	if (_tobe_removed_total == _removed_total) exitWith { true };
 	// missing parts
