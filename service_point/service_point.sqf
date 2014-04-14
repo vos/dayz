@@ -129,7 +129,11 @@ while {true} do {
 		if (_inRange) then {
 			private ["_servicePoint","_role","_actionCondition","_costs","_actionTitle"];
 			_servicePoint = _servicePoints select 0;
-			_role = assignedVehicleRole player;
+			if (assignedDriver _vehicle == player) then {
+				_role = ["Driver", [-1]];
+			} else {
+				_role = assignedVehicleRole player;
+			};
 			if (((str _role) != (str _lastRole)) || (_vehicle != _lastVehicle)) then {
 				// vehicle or seat changed
 				call _fnc_removeActions;
