@@ -1,6 +1,6 @@
 // Vehicle Service Point (Refuel) by Axe Cop
 
-private ["_vehicle","_args","_servicePoint","_costs","_updateInterval","_amount","_type","_name"];
+private ["_vehicle","_args","_servicePoint","_costs","_updateInterval","_amount","_type","_name","_textMissing"];
 
 _vehicle = _this select 0;
 if (!local _vehicle) exitWith { diag_log format["Error: called service_point_refuel.sqf with non-local vehicle: %1", _vehicle] };
