@@ -87,10 +87,10 @@ ELE_fnc_getNextStop = {
 	_nextStopId = _currentStopId + _stopDiff;
 	if (_nextStopId < 0 || _nextStopId > _maxStopId) exitWith {
 		diag_log format ["ELE_fnc_getNextStop next stop id %1 is out of range", _nextStopId];
-		nil
+		objNull
 	};
 	_maxRange = ELE_MaxRange * (abs _stopDiff);
-	_stop = nil;
+	_stop = objNull;
 	{
 		_xid = [_x] call ELE_fnc_getElevatorId;
 		if ((_xid select 0) == _id && (_xid select 1) == _nextStopId) exitWith {
@@ -107,7 +107,7 @@ ELE_fnc_hasNextStop = {
 	private ["_elevator","_stop","_b"];
 	_elevator = _this select 0;
 	_stop = [_elevator, +1] call ELE_fnc_getNextStop;
-	_b = !isNil "_stop";
+	_b = !isNull _stop;
 	_b
 };
 
@@ -117,7 +117,7 @@ ELE_fnc_hasPreviousStop = {
 	private ["_elevator","_stop","_b"];
 	_elevator = _this select 0;
 	_stop = [_elevator, -1] call ELE_fnc_getNextStop;
-	_b = !isNil "_stop";
+	_b = !isNull _stop;
 	_b
 };
 
