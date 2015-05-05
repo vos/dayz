@@ -30,7 +30,7 @@ if !([[[_costs select 0, _costs select 1]],0] call epoch_returnChange) then {
 	// remove all magazines
 	_magazines = _vehicle magazinesTurret _turret;
 	{
-		_vehicle removeMagazineTurret [_x, _turret];
+		_vehicle removeMagazineTurret [_ammo, _turret];
 	} forEach _magazines;
 	
 	// add magazines
