@@ -29,8 +29,9 @@ _repair_repairTime = 2; // time needed to repair each damaged part (in seconds)
 
 // rearm settings
 _rearm_enable = true; // enable or disable the rearm option
+_rearm_defaultcost = ["ItemGoldBar10oz",1]; // Default cost to rearm a weapon.
 _rearm_costs = [
-	["M256",["ItemGoldBar10oz",2]] // special costs for a single weapon type (M1A1 HE Rounds
+	["M256",["ItemGoldBar10oz",2]] // special costs for a single weapon type (M1A1 SABOT Rounds)
 ];
 _rearm_magazineCount = 3; // amount of magazines to be added to the vehicle weapon
 
@@ -78,7 +79,7 @@ _fnc_getCostsWep = {
         private ["_weapon","_costs","_cost"];
         _weapon = _this select 0;
         _costs = _this select 1;
-        _cost = ["ItemGoldBar10oz",2];
+        _cost = _rearm_defaultcost;
         {
                 private "_typeName";
                 _typeName = _x select 0;
