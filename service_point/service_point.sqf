@@ -29,10 +29,9 @@ _repair_repairTime = 2; // time needed to repair each damaged part (in seconds)
 
 // rearm settings
 _rearm_enable = true; // enable or disable the rearm option
+_rearm_defaultcost = ["ItemGoldBar10oz",1]; // Default cost to rearm a weapon.
 _rearm_costs = [
-	["ArmoredSUV_PMC_DZE",["ItemGoldBar10oz",2]], // special costs for a single vehicle type
-	["Air",["ItemGoldBar10oz",2]], // 2 10oz Gold for helicopters and planes
-	["AllVehicles",["ItemGoldBar10oz",1]] // 1 10oz Gold for all other vehicles
+	["M256",["ItemGoldBar10oz",2]] // special costs for a single weapon type (M1A1 SABOT Rounds)
 ];
 _rearm_magazineCount = 3; // amount of magazines to be added to the vehicle weapon
 
@@ -74,6 +73,21 @@ _fnc_getCosts = {
 		};
 	} forEach _costs;
 	_cost
+};
+
+_fnc_getCostsWep = {
+        private ["_weapon","_costs","_cost"];
+        _weapon = _this select 0;
+        _costs = _this select 1;
+        _cost = _rearm_defaultcost;
+        {
+                private "_typeName";
+                _typeName = _x select 0;
+                if (_weapon == _typeName) exitWith {
+                        _cost = _x select 1;
+                };
+        } forEach _costs;
+        _cost
 };
 
 _fnc_actionTitle = {
@@ -155,15 +169,15 @@ while {true} do {
 			};
 			if ((_role call _fnc_isArmed) && (count SP_rearm_actions == 0) && _rearm_enable) then {
 				private ["_weapons"];
-				_costs = [_vehicle, _rearm_costs] call _fnc_getCosts;
 				_weapons = [_vehicle, _role] call _fnc_getWeapons;
-				{
-					private "_weaponName";
-					_weaponName = _x select 1;
-					_actionTitle = [format["Rearm %1", _weaponName], _costs] call _fnc_actionTitle;
-					SP_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_servicePoint, _costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
-					SP_rearm_actions set [count SP_rearm_actions, SP_rearm_action];
-				} forEach _weapons;
+                                {
+                                        private "_weaponName";
+                                        _weaponName = _x select 1;
+					_costs = [_weaponName, _rearm_costs] call _fnc_getCostsWep;
+                                        _actionTitle = [format["Rearm %1", _weaponName], _costs] call _fnc_actionTitle;
+                                        SP_rearm_action = _vehicle addAction [_actionTitle, _folder + "service_point_rearm.sqf", [_servicePoint, _costs, _rearm_magazineCount, _x], -1, false, true, "", _actionCondition];
+                                        SP_rearm_actions set [count SP_rearm_actions, SP_rearm_action];
+                                } forEach _weapons;
 			};
 			if (!_messageShown && _message != "") then {
 				_messageShown = true;
